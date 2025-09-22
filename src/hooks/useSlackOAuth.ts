@@ -9,7 +9,9 @@ export function useSlackOAuth() {
   const { login } = useAuth();
   const { error, handleError, clearError } = useError();
 
-  // Iniciar fluxo de login
+  /* 
+    This function initiates the Slack OAuth login flow.
+  */
   const initiateLogin = useCallback(() => {
     if (!slackConfig.clientId) {
       handleError(new Error("Por favor, configure o Client ID do Slack"));
@@ -38,7 +40,9 @@ export function useSlackOAuth() {
     window.location.href = authUrl;
   }, [handleError, clearError, login]);
 
-  // Processar callback OAuth
+  /* 
+    This function handles the OAuth callback.
+  */
   const handleCallback = useCallback(
     async (code: string, state: string) => {
       clearError();
@@ -96,7 +100,9 @@ export function useSlackOAuth() {
     [login, handleError, clearError]
   );
 
-  // Processar callback na inicialização
+  /* 
+    This effect handles the OAuth callback when the page is loaded.
+  */
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const code = urlParams.get("code");
