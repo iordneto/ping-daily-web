@@ -20,9 +20,9 @@ interface SlackConfig {
 
 export default function Home() {
   const [config, setConfig] = useState<SlackConfig>({
-    clientId: "9359153662263.9375043160484",
-    clientSecret: "d70f0f91f2909e63817b319d217d2690",
-    redirectUri: "https://r6edzk-ip-186-222-20-25.tunnelmole.net",
+    clientId: process.env.NEXT_PUBLIC_SLACK_CLIENT_ID!,
+    clientSecret: process.env.NEXT_PUBLIC_SLACK_CLIENT_SECRET!,
+    redirectUri: process.env.NEXT_PUBLIC_SLACK_REDIRECT_URI!,
   });
   const [user, setUser] = useState<SlackUser | null>(null);
   const [loading, setLoading] = useState(false);
@@ -164,63 +164,8 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
       <div className="max-w-md w-full bg-white rounded-lg shadow-md p-6">
-        <h1 className="text-2xl font-bold text-center mb-6">
-          Sign in with Slack
-        </h1>
-
         {!user ? (
           <>
-            {/* Configuração do Slack App */}
-            <div className="mb-6">
-              <h2 className="text-lg font-semibold mb-4">
-                Configuração da App
-              </h2>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Client ID
-                  </label>
-                  <input
-                    type="text"
-                    value={config.clientId}
-                    onChange={(e) =>
-                      setConfig({ ...config, clientId: e.target.value })
-                    }
-                    placeholder="Seu Client ID do Slack"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Client Secret
-                  </label>
-                  <input
-                    type="password"
-                    value={config.clientSecret}
-                    onChange={(e) =>
-                      setConfig({ ...config, clientSecret: e.target.value })
-                    }
-                    placeholder="Seu Client Secret do Slack"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Redirect URI
-                  </label>
-                  <input
-                    type="text"
-                    value={config.redirectUri}
-                    onChange={(e) =>
-                      setConfig({ ...config, redirectUri: e.target.value })
-                    }
-                    placeholder="http://localhost:3000/"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-              </div>
-            </div>
-
             {/* Botão Sign in with Slack */}
             <button
               onClick={initiateSlackLogin}
@@ -253,28 +198,6 @@ export default function Home() {
                 {error}
               </div>
             )}
-
-            {/* Instruções */}
-            <div className="mt-6 text-xs text-gray-500">
-              <p>
-                <strong>Para configurar:</strong>
-              </p>
-              <ol className="list-decimal list-inside mt-2 space-y-1">
-                <li>
-                  Acesse{" "}
-                  <a
-                    href="https://api.slack.com/apps"
-                    className="text-blue-600 underline"
-                  >
-                    api.slack.com/apps
-                  </a>
-                </li>
-                <li>Crie uma nova app ou selecione uma existente</li>
-                <li>Vá em "OAuth & Permissions"</li>
-                <li>Adicione o Redirect URL: {config.redirectUri}</li>
-                <li>Copie o Client ID e Client Secret</li>
-              </ol>
-            </div>
           </>
         ) : (
           <>
