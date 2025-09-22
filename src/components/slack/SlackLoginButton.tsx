@@ -1,8 +1,18 @@
+/**
+ * Props for the SlackLoginButton component
+ */
 interface SlackLoginButtonProps {
+  /** Function to call when login button is clicked */
   onLogin: () => void;
+  /** Whether the button should be disabled */
   disabled?: boolean;
 }
 
+/**
+ * Slack login button component following Slack's design guidelines
+ * @param {SlackLoginButtonProps} props - The component props
+ * @returns {JSX.Element} The Slack login button component
+ */
 export function SlackLoginButton({
   onLogin,
   disabled = false,

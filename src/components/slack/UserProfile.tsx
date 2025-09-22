@@ -1,13 +1,22 @@
-import type { SlackUser } from "@/types";
+import type { SlackUser } from "@/types/slack";
 
+/**
+ * Props for the UserProfile component
+ */
 interface UserProfileProps {
+  /** The Slack user data to display */
   user: SlackUser;
 }
 
+/**
+ * Displays user profile information including avatar and user details
+ * @param {UserProfileProps} props - The component props
+ * @returns {JSX.Element} The user profile component
+ */
 export function UserProfile({ user }: UserProfileProps) {
   return (
     <>
-      {/* Avatar e boas-vindas */}
+      {/* Avatar and welcome message */}
       <div className="text-center mb-6">
         <div className="w-20 h-20 bg-gray-200 rounded-full mx-auto mb-4 flex items-center justify-center">
           <svg
@@ -23,12 +32,12 @@ export function UserProfile({ user }: UserProfileProps) {
             />
           </svg>
         </div>
-        <h2 className="text-xl font-semibold">Bem-vindo!</h2>
+        <h2 className="text-xl font-semibold">Welcome!</h2>
       </div>
 
-      {/* Informações do usuário */}
+      {/* User information */}
       <div className="space-y-3 mb-6">
-        <UserInfoRow label="Nome" value={user.name} />
+        <UserInfoRow label="Name" value={user.name} />
         <UserInfoRow label="Email" value={user.email} />
         <UserInfoRow
           label="User ID"
@@ -45,12 +54,23 @@ export function UserProfile({ user }: UserProfileProps) {
   );
 }
 
+/**
+ * Props for the UserInfoRow component
+ */
 interface UserInfoRowProps {
+  /** The label text for the information row */
   label: string;
+  /** The value to display */
   value: string;
+  /** Whether to use monospace font for the value */
   mono?: boolean;
 }
 
+/**
+ * Displays a single row of user information with label and value
+ * @param {UserInfoRowProps} props - The component props
+ * @returns {JSX.Element} The user info row component
+ */
 function UserInfoRow({ label, value, mono = false }: UserInfoRowProps) {
   return (
     <div className="flex justify-between">

@@ -1,13 +1,19 @@
-import { SlackUser } from "@/types";
+import { SlackUser } from "@/types/slack";
 
-/* 
-    This function decodes a JWT token and returns the payload.
-    It is used to decode the id_token from the Slack OAuth flow.
-*/
+/**
+ * Decodes a JWT token and extracts the payload containing user information
+ * Used specifically for decoding id_tokens from Slack's OAuth flow
+ * @param {string} token - The JWT token to decode (format: header.payload.signature)
+ * @returns {SlackUser} The decoded user data from the token payload
+ * @throws {Error} When the token format is invalid
+ * @example
+ * const userData = decodeJWT(idToken);
+ * console.log(userData.name); // User's name
+ */
 export const decodeJWT = (token: string): SlackUser => {
   const parts = token.split(".");
   if (parts.length !== 3) {
-    throw new Error("Token JWT inválido");
+    throw new Error("Invalid JWT token");
   }
 
   const payload = parts[1];

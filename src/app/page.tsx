@@ -4,6 +4,11 @@ import { useAuth } from "@/contexts/AuthContext";
 import { SlackLoginForm } from "@/components/slack/SlackLoginForm";
 import { SlackDashboard } from "@/components/slack/SlackDashboard";
 
+/**
+ * Home page component that renders either login form or user dashboard
+ * Based on authentication state from the AuthContext
+ * @returns {JSX.Element} The home page component
+ */
 export default function Home() {
   const { user } = useAuth();
 

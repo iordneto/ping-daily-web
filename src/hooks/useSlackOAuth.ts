@@ -5,13 +5,19 @@ import { generateRandomString } from "@/utils/generateRandomString";
 import { decodeJWT } from "@/utils/decodeJWT";
 import { useError } from "./useError";
 
+/**
+ * Custom hook for handling Slack OAuth authentication flow
+ * @returns {Object} An object containing OAuth functions and error state
+ */
 export function useSlackOAuth() {
   const { login } = useAuth();
   const { error, handleError, clearError } = useError();
 
-  /* 
-    This function initiates the Slack OAuth login flow.
-  */
+  /**
+   * Initiates the Slack OAuth login flow by redirecting to Slack's authorization URL
+   * @function
+   * @returns {void}
+   */
   const initiateLogin = useCallback(() => {
     if (!slackConfig.clientId) {
       handleError(new Error("Please configure the Slack Client ID"));
@@ -23,9 +29,7 @@ export function useSlackOAuth() {
     const state = generateRandomString(16);
     const nonce = generateRandomString(16);
 
-    /* 
-      Save the state and nonce in localStorage for validation later.
-    */
+    // Save state and nonce in localStorage for later validation
     localStorage.setItem(OAUTH_STORAGE_KEYS.STATE, state);
     localStorage.setItem(OAUTH_STORAGE_KEYS.NONCE, nonce);
 
@@ -42,9 +46,13 @@ export function useSlackOAuth() {
     window.location.href = authUrl;
   }, [handleError, clearError, login]);
 
-  /* 
-    This function handles the OAuth callback.
-  */
+  /**
+   * Handles the OAuth callback by exchanging authorization code for access token
+   * @function
+   * @param {string} code - Authorization code received from Slack
+   * @param {string} state - State parameter for CSRF protection
+   * @returns {Promise<void>}
+   */
   const handleCallback = useCallback(
     async (code: string, state: string) => {
       clearError();
@@ -52,12 +60,10 @@ export function useSlackOAuth() {
       try {
         const savedState = localStorage.getItem(OAUTH_STORAGE_KEYS.STATE);
         if (state !== savedState) {
-          throw new Error("Estado OAuth inválido");
+          throw new Error("Invalid OAuth state");
         }
 
-        /* 
-          Exchange the code for a token.
-        */
+        // Exchange authorization code for access token
         const tokenResponse = await fetch("/api/slack/token", {
           method: "POST",
           headers: {
@@ -72,7 +78,7 @@ export function useSlackOAuth() {
         });
 
         if (!tokenResponse.ok) {
-          throw new Error("Falha ao trocar código por token");
+          throw new Error("Failed to exchange code for token");
         }
 
         const tokenData = await tokenResponse.json();
@@ -82,20 +88,16 @@ export function useSlackOAuth() {
 
           const savedNonce = localStorage.getItem(OAUTH_STORAGE_KEYS.NONCE);
           if (userData.nonce !== savedNonce) {
-            throw new Error("Nonce JWT inválido");
+            throw new Error("Invalid JWT nonce");
           }
 
           login(userData, tokenData.access_token);
 
-          /* 
-            Clear the localStorage.
-          */
+          // Clear OAuth data from localStorage
           localStorage.removeItem(OAUTH_STORAGE_KEYS.STATE);
           localStorage.removeItem(OAUTH_STORAGE_KEYS.NONCE);
 
-          /* 
-            Clear the URL.
-          */
+          // Clear URL parameters
           window.history.replaceState({}, document.title, "/");
         }
       } catch (err) {
@@ -105,9 +107,10 @@ export function useSlackOAuth() {
     [login, handleError, clearError]
   );
 
-  /* 
-    This effect handles the OAuth callback when the page is loaded.
-  */
+  /**
+   * Effect that handles OAuth callback processing on component mount
+   * Checks URL parameters for OAuth response and processes them accordingly
+   */
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const code = urlParams.get("code");
@@ -125,8 +128,11 @@ export function useSlackOAuth() {
   }, [handleCallback, handleError]);
 
   return {
+    /** Current error message from OAuth operations */
     error,
+    /** Function to initiate Slack OAuth login flow */
     initiateLogin,
+    /** Function to clear current error state */
     clearError,
   };
 }

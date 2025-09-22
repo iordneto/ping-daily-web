@@ -1,19 +1,24 @@
 import { NextRequest, NextResponse } from "next/server";
 
+/**
+ * Fetches Slack channels that the authenticated user is a member of
+ * @param {NextRequest} request - The incoming request with Authorization header
+ * @returns {Promise<NextResponse>} Response containing user's channels data
+ */
 export async function GET(request: NextRequest) {
   try {
-    // Pegar access_token do header Authorization
+    // Extract access_token from Authorization header
     const authHeader = request.headers.get("Authorization");
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return NextResponse.json(
-        { error: "Token de acesso não encontrado" },
+        { error: "Access token not found" },
         { status: 401 }
       );
     }
 
     const accessToken = authHeader.split(" ")[1];
 
-    // 🔍 Buscar canais públicos que o usuário está
+    // Fetch public and private channels from Slack API
     const channelsResponse = await fetch(
       "https://slack.com/api/conversations.list?types=public_channel,private_channel&exclude_archived=true",
       {
@@ -25,19 +30,19 @@ export async function GET(request: NextRequest) {
     );
 
     if (!channelsResponse.ok) {
-      throw new Error("Falha ao buscar canais");
+      throw new Error("Failed to fetch channels");
     }
 
     const channelsData = await channelsResponse.json();
 
     if (!channelsData.ok) {
       return NextResponse.json(
-        { error: channelsData.error || "Erro na API do Slack" },
+        { error: channelsData.error || "Slack API error" },
         { status: 400 }
       );
     }
 
-    // 🔍 Filtrar apenas canais que o usuário é membro
+    // Filter only channels where the user is a member
     const userChannels = channelsData.channels.filter(
       (channel: any) => channel.is_member
     );
@@ -55,7 +60,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error("Channels API error:", error);
     return NextResponse.json(
-      { error: "Erro interno do servidor" },
+      { error: "Internal server error" },
       { status: 500 }
     );
   }

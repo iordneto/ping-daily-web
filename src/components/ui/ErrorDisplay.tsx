@@ -1,8 +1,18 @@
+/**
+ * Props for the ErrorDisplay component
+ */
 interface ErrorDisplayProps {
+  /** The error message to display */
   error: string;
+  /** Additional CSS classes to apply */
   className?: string;
 }
 
+/**
+ * Displays error messages with consistent styling
+ * @param {ErrorDisplayProps} props - The component props
+ * @returns {JSX.Element | null} The error display component or null if no error
+ */
 export function ErrorDisplay({ error, className = "" }: ErrorDisplayProps) {
   if (!error) return null;
 

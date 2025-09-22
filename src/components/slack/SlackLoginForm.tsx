@@ -4,6 +4,10 @@ import { SlackLoginButton } from "./SlackLoginButton";
 import { ErrorDisplay } from "../ui/ErrorDisplay";
 import { LoadingSpinner } from "../ui/LoadingSpinner";
 
+/**
+ * Complete Slack login form component with login button, loading states, and error handling
+ * @returns {JSX.Element} The Slack login form component
+ */
 export function SlackLoginForm() {
   const { isLoading } = useAuth();
   const { error, initiateLogin } = useSlackOAuth();
@@ -12,9 +16,7 @@ export function SlackLoginForm() {
     <>
       <SlackLoginButton onLogin={initiateLogin} disabled={isLoading} />
 
-      {isLoading && (
-        <LoadingSpinner message="Processando..." className="mt-4" />
-      )}
+      {isLoading && <LoadingSpinner message="Processing..." className="mt-4" />}
 
       {error && <ErrorDisplay error={error} className="mt-4" />}
     </>

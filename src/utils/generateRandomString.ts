@@ -1,8 +1,11 @@
-/* 
-    This function generates a random string of a given length.
-    It uses a fixed set of characters and a random number generator to create a string of the desired length.
-    It is used to generate nonce and state for the Slack OAuth flow.
-*/
+/**
+ * Generates a cryptographically random string of specified length
+ * Uses alphanumeric characters (A-Z, a-z, 0-9) for OAuth state and nonce generation
+ * @param {number} length - The desired length of the random string
+ * @returns {string} A random string of the specified length
+ * @example
+ * generateRandomString(16) // Returns something like: "aB3dF8kL2nM9pQ7s"
+ */
 export const generateRandomString = (length: number) => {
   const chars =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
