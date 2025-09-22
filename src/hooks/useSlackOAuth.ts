@@ -14,7 +14,7 @@ export function useSlackOAuth() {
   */
   const initiateLogin = useCallback(() => {
     if (!slackConfig.clientId) {
-      handleError(new Error("Por favor, configure o Client ID do Slack"));
+      handleError(new Error("Please configure the Slack Client ID"));
       return;
     }
 
@@ -23,7 +23,9 @@ export function useSlackOAuth() {
     const state = generateRandomString(16);
     const nonce = generateRandomString(16);
 
-    // Salvar state e nonce no localStorage para validação posterior
+    /* 
+      Save the state and nonce in localStorage for validation later.
+    */
     localStorage.setItem(OAUTH_STORAGE_KEYS.STATE, state);
     localStorage.setItem(OAUTH_STORAGE_KEYS.NONCE, nonce);
 
@@ -48,13 +50,14 @@ export function useSlackOAuth() {
       clearError();
 
       try {
-        // Validar state
         const savedState = localStorage.getItem(OAUTH_STORAGE_KEYS.STATE);
         if (state !== savedState) {
           throw new Error("Estado OAuth inválido");
         }
 
-        // Trocar código por token
+        /* 
+          Exchange the code for a token.
+        */
         const tokenResponse = await fetch("/api/slack/token", {
           method: "POST",
           headers: {
@@ -74,11 +77,9 @@ export function useSlackOAuth() {
 
         const tokenData = await tokenResponse.json();
 
-        // Decodificar JWT id_token
         if (tokenData.id_token && tokenData.access_token) {
           const userData = decodeJWT(tokenData.id_token);
 
-          // Validar nonce
           const savedNonce = localStorage.getItem(OAUTH_STORAGE_KEYS.NONCE);
           if (userData.nonce !== savedNonce) {
             throw new Error("Nonce JWT inválido");
@@ -86,11 +87,15 @@ export function useSlackOAuth() {
 
           login(userData, tokenData.access_token);
 
-          // Limpar localStorage
+          /* 
+            Clear the localStorage.
+          */
           localStorage.removeItem(OAUTH_STORAGE_KEYS.STATE);
           localStorage.removeItem(OAUTH_STORAGE_KEYS.NONCE);
 
-          // Limpar URL
+          /* 
+            Clear the URL.
+          */
           window.history.replaceState({}, document.title, "/");
         }
       } catch (err) {
