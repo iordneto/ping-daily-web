@@ -1,31 +1,19 @@
 "use client";
 
+import { useAuth } from "@/contexts/AuthContext";
+import type { SlackConfig, SlackUser } from "@/types";
+import { decodeJWT } from "@/utils/decodeJWT";
+import { generateRandomString } from "@/utils/generateRandomString";
 import { useState, useEffect } from "react";
 
-interface SlackUser {
-  sub: string;
-  name: string;
-  email: string;
-  picture?: string;
-  nonce?: string;
-  "https://slack.com/team_id": string;
-  "https://slack.com/user_id": string;
-}
-
-interface SlackConfig {
-  clientId: string;
-  clientSecret: string;
-  redirectUri: string;
-}
+const config: SlackConfig = {
+  clientId: process.env.NEXT_PUBLIC_SLACK_CLIENT_ID!,
+  clientSecret: process.env.NEXT_PUBLIC_SLACK_CLIENT_SECRET!,
+  redirectUri: process.env.NEXT_PUBLIC_SLACK_REDIRECT_URI!,
+};
 
 export default function Home() {
-  const [config, setConfig] = useState<SlackConfig>({
-    clientId: process.env.NEXT_PUBLIC_SLACK_CLIENT_ID!,
-    clientSecret: process.env.NEXT_PUBLIC_SLACK_CLIENT_SECRET!,
-    redirectUri: process.env.NEXT_PUBLIC_SLACK_REDIRECT_URI!,
-  });
-  const [user, setUser] = useState<SlackUser | null>(null);
-  const [loading, setLoading] = useState(false);
+  const { user, login, logout, isLoading } = useAuth();
   const [error, setError] = useState<string>("");
 
   // Processar callback do OAuth quando a página carrega
@@ -44,17 +32,6 @@ export default function Home() {
       handleOAuthCallback(code, state);
     }
   }, []);
-
-  // Gerar nonce e state para segurança
-  const generateRandomString = (length: number) => {
-    const chars =
-      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    let result = "";
-    for (let i = 0; i < length; i++) {
-      result += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return result;
-  };
 
   // Iniciar o fluxo de login
   const initiateSlackLogin = () => {
@@ -83,9 +60,7 @@ export default function Home() {
     window.location.href = authUrl;
   };
 
-  // Processar callback e trocar código por token
   const handleOAuthCallback = async (code: string, state: string) => {
-    setLoading(true);
     setError("");
 
     try {
@@ -125,7 +100,7 @@ export default function Home() {
           throw new Error("Nonce JWT inválido");
         }
 
-        setUser(userData);
+        login(userData);
 
         // Limpar localStorage
         localStorage.removeItem("slack_oauth_state");
@@ -136,29 +111,7 @@ export default function Home() {
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erro desconhecido");
-    } finally {
-      setLoading(false);
     }
-  };
-
-  // Decodificar JWT simples (apenas para demonstração)
-  const decodeJWT = (token: string): SlackUser => {
-    const parts = token.split(".");
-    if (parts.length !== 3) {
-      throw new Error("Token JWT inválido");
-    }
-
-    const payload = parts[1];
-    const decoded = atob(payload.replace(/-/g, "+").replace(/_/g, "/"));
-    return JSON.parse(decoded);
-  };
-
-  // Logout
-  const logout = () => {
-    setUser(null);
-    setError("");
-    localStorage.removeItem("slack_oauth_state");
-    localStorage.removeItem("slack_oauth_nonce");
   };
 
   return (
@@ -169,7 +122,7 @@ export default function Home() {
             {/* Botão Sign in with Slack */}
             <button
               onClick={initiateSlackLogin}
-              disabled={loading || !config.clientId}
+              disabled={isLoading || !config.clientId}
               className="w-full bg-white text-black border border-gray-300 rounded-md py-3 px-4 font-bold text-sm hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 transition-colors"
             >
               <svg
@@ -187,7 +140,7 @@ export default function Home() {
               Sign in with Slack
             </button>
 
-            {loading && (
+            {isLoading && (
               <div className="mt-4 text-center text-sm text-gray-600">
                 Processando...
               </div>
