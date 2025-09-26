@@ -44,17 +44,30 @@ import {
   getHistoryByChannelId,
   getUsersByIds,
   type DailyStandupHistory,
+  type DailyStandupConfig,
 } from "@/lib/mock-data";
+
+import EditConfigDialog from "@/components/daily-standup/EditConfigDialog";
 
 export default function ChannelPage() {
   const params = useParams();
   const channelId = params.id as string;
 
   const channel = mockChannels.find((c) => c.id === channelId);
-  const config = getConfigByChannelId(channelId);
+  const initialConfig = getConfigByChannelId(channelId);
   const history = getHistoryByChannelId(channelId);
+
+  const [config, setConfig] = useState<DailyStandupConfig | undefined>(
+    initialConfig
+  );
   const [selectedHistory, setSelectedHistory] =
     useState<DailyStandupHistory | null>(null);
+
+  const handleConfigSave = (updatedConfig: DailyStandupConfig) => {
+    setConfig(updatedConfig);
+    // Aqui você faria a chamada para a API para salvar a configuração
+    console.log("Configuração atualizada:", updatedConfig);
+  };
 
   if (!channel) {
     return (
@@ -145,10 +158,16 @@ export default function ChannelPage() {
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <CardTitle>Configuração Atual</CardTitle>
-                    <Button variant="outline" size="sm">
-                      <Settings className="w-4 h-4 mr-2" />
-                      Editar
-                    </Button>
+                    <EditConfigDialog
+                      config={config}
+                      channelName={channel.name}
+                      onSave={handleConfigSave}
+                    >
+                      <Button variant="outline" size="sm">
+                        <Settings className="w-4 h-4 mr-2" />
+                        Editar
+                      </Button>
+                    </EditConfigDialog>
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
