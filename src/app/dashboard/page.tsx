@@ -59,11 +59,22 @@ export default function DashboardPage() {
     <div className="container mx-auto p-6">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-4xl font-bold mb-2">Daily Standups Dashboard</h1>
-        <p className="text-muted-foreground text-lg">
-          Gerencie suas configurações de daily standups e acompanhe o
-          engajamento da equipe
+        <div className="flex items-center gap-4 mb-4">
+          <div className="w-3 h-3 bg-primary rounded-full animate-pulse"></div>
+          <h1 className="text-4xl font-bold text-primary tracking-wider">
+            TACTICAL DAILY OPS
+          </h1>
+        </div>
+        <p className="text-muted-foreground text-lg font-medium">
+          SISTEMA DE CONTROLE E MONITORAMENTO DE DAILY STANDUPS
         </p>
+        <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
+          <span>STATUS: OPERACIONAL</span>
+          <span>•</span>
+          <span>UPTIME: 99.9%</span>
+          <span>•</span>
+          <span>ÚLTIMA ATUALIZAÇÃO: {new Date().toLocaleTimeString()}</span>
+        </div>
       </div>
 
       {/* Stats Cards */}

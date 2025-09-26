@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
+import { GeistSans, GeistMono } from "geist/font";
 import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
 
 export const metadata: Metadata = {
-  title: "Ping Daily Dashboard",
-  description: "Manage your team's daily check-ins and standups with ease",
+  title: "Ping Daily - Tactical Operations Dashboard",
+  description: "Tactical daily standup command and control system",
 };
 
 export default function RootLayout({
@@ -13,8 +14,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html>
-      <body>
+    <html lang="en">
+      <body
+        className={`${GeistMono.className} bg-background text-foreground antialiased`}
+      >
         <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
