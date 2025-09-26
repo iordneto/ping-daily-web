@@ -26,11 +26,34 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   getChannelsWithConfig,
   getConfigByChannelId,
+  getAvailableChannels,
   mockUsers,
+  mockConfigs,
+  type DailyStandupConfig,
 } from "@/lib/mock-data";
 
+import CreateConfigDialog from "@/components/daily-standup/CreateConfigDialog";
+
 export default function DashboardPage() {
-  const channelsWithConfig = getChannelsWithConfig();
+  const [channelsWithConfig, setChannelsWithConfig] = useState(
+    getChannelsWithConfig()
+  );
+  const availableChannels = getAvailableChannels();
+
+  const handleConfigCreate = (newConfig: Omit<DailyStandupConfig, "id">) => {
+    // Aqui você faria a chamada para a API para criar a configuração
+    const configWithId = {
+      ...newConfig,
+      id: `CONFIG${Date.now()}`, // ID temporário
+    };
+
+    console.log("Nova configuração criada:", configWithId);
+
+    // Atualizar a lista local (simular atualização da API)
+    // Em um cenário real, você refaria a busca dos dados ou usaria um state manager
+    const updatedChannels = getChannelsWithConfig();
+    setChannelsWithConfig(updatedChannels);
+  };
 
   return (
     <div className="container mx-auto p-6">
@@ -97,10 +120,27 @@ export default function DashboardPage() {
       <div className="mb-6">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-2xl font-semibold">Canais Configurados</h2>
-          <Button>
-            <Plus className="w-4 h-4 mr-2" />
-            Nova Configuração
-          </Button>
+          {availableChannels.length > 0 ? (
+            <CreateConfigDialog
+              availableChannels={availableChannels}
+              onSave={handleConfigCreate}
+            >
+              <Button>
+                <Plus className="w-4 h-4 mr-2" />
+                Nova Configuração
+              </Button>
+            </CreateConfigDialog>
+          ) : (
+            <div className="text-right">
+              <Button disabled>
+                <Plus className="w-4 h-4 mr-2" />
+                Nova Configuração
+              </Button>
+              <p className="text-xs text-muted-foreground mt-1">
+                Todos os canais já possuem configuração
+              </p>
+            </div>
+          )}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

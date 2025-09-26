@@ -264,6 +264,11 @@ export function getChannelsWithConfig(): SlackChannel[] {
   return mockChannels.filter((channel) => channel.hasConfiguration);
 }
 
+// Função para buscar canais disponíveis (sem configuração)
+export function getAvailableChannels(): SlackChannel[] {
+  return mockChannels.filter((channel) => !channel.hasConfiguration);
+}
+
 // Função para buscar configuração por ID do canal
 export function getConfigByChannelId(
   channelId: string
