@@ -1,8 +1,11 @@
 "use client";
 
+import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
 import { SlackLoginForm } from "@/components/slack/SlackLoginForm";
 import { SlackDashboard } from "@/components/slack/SlackDashboard";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 /**
  * Home page component that renders either login form or user dashboard
@@ -13,13 +16,49 @@ export default function Home() {
   const { user } = useAuth();
 
   return (
-    <main className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
-      <div className="max-w-md w-full bg-white rounded-lg shadow-md p-6">
-        <h1 className="text-2xl font-bold text-center mb-6">
-          Sign in with Slack
-        </h1>
+    <main className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
+      <div className="max-w-md w-full space-y-4">
+        <Card className="border-border">
+          <CardHeader>
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
+              <CardTitle className="text-center text-primary font-bold tracking-wider">
+                PING DAILY TACTICAL
+              </CardTitle>
+            </div>
+            <p className="text-xs text-muted-foreground text-center">
+              v1.0.0 OPERATIONAL
+            </p>
+          </CardHeader>
+          <CardContent>
+            <h1 className="text-lg font-bold text-center mb-6 text-accent-foreground">
+              SECURE SLACK INTEGRATION
+            </h1>
+            {user ? <SlackDashboard /> : <SlackLoginForm />}
+          </CardContent>
+        </Card>
 
-        {user ? <SlackDashboard /> : <SlackLoginForm />}
+        {/* Tactical Dashboard Access */}
+        <Card className="border-border">
+          <CardContent className="pt-6">
+            <div className="text-center">
+              <div className="flex items-center justify-center gap-2 mb-2">
+                <div className="w-1 h-1 bg-primary rounded-full"></div>
+                <h2 className="font-bold text-primary tracking-wider">
+                  COMMAND CENTER
+                </h2>
+              </div>
+              <p className="text-sm text-muted-foreground mb-4">
+                Acesse o sistema de controle de daily standups
+              </p>
+              <Link href="/dashboard">
+                <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold tracking-wider">
+                  ACESSAR DASHBOARD
+                </Button>
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </main>
   );

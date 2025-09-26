@@ -121,4 +121,22 @@
     background-color: var(--color-background);
     color: var(--color-foreground);
   }
+
+  /* Ensure all interactive elements have proper cursor */
+  button,
+  [role="button"],
+  input[type="submit"],
+  input[type="reset"],
+  input[type="button"],
+  label[for],
+  select {
+    cursor: pointer;
+  }
+
+  /* Disabled elements should not be clickable */
+  button:disabled,
+  [role="button"][disabled],
+  input:disabled {
+    cursor: not-allowed;
+  }
 }
