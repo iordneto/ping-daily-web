@@ -14,8 +14,7 @@ export const slackConfig: SlackConfig = {
  * OAuth scopes required for Slack authentication and API access
  * @constant {string}
  */
-export const OAUTH_SCOPES =
-  "openid profile email channels:read groups:read mpim:read";
+export const OAUTH_SCOPES = "openid profile email";
 
 /**
  * LocalStorage keys used for OAuth state management
