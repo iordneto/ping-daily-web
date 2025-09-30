@@ -9,6 +9,8 @@ import {
 } from "react";
 import { SlackUser } from "@/types/slack";
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
 /**
  * Type definition for the authentication context
  */
@@ -17,12 +19,18 @@ interface AuthContextType {
   user: SlackUser | null;
   /** Current access token for API calls */
   accessToken: string | null;
+  /** Current ID token for API calls */
+  idToken: string | null;
   /** Function to log in a user with their data and token */
-  login: (userData: SlackUser, accessToken: string) => void;
+  login: (params: {
+    userData: SlackUser;
+    accessToken: string;
+    idToken: string;
+  }) => void;
   /** Function to log out the current user */
   logout: () => void;
   /** Function to make authenticated calls to Slack API */
-  callSlackAPI: (endpoint: string, options?: RequestInit) => Promise<any>;
+  callSlackAPI: <T>(endpoint: string, options?: RequestInit) => Promise<T>;
   /** Loading state for authentication operations */
   isLoading: boolean;
 }
@@ -38,6 +46,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<SlackUser | null>(null);
   const [accessToken, setAccessToken] = useState<string | null>(null);
+  const [idToken, setIdToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   /**
@@ -46,15 +55,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const savedUser = localStorage.getItem("slack_user");
     const savedToken = localStorage.getItem("slack_access_token");
+    const savedIdToken = localStorage.getItem("slack_id_token");
 
     if (savedUser && savedToken) {
       try {
         setUser(JSON.parse(savedUser));
         setAccessToken(savedToken);
+        setIdToken(savedIdToken);
       } catch (error) {
         console.error("Error restoring user data:", error);
         localStorage.removeItem("slack_user");
         localStorage.removeItem("slack_access_token");
+        localStorage.removeItem("slack_id_token");
       }
     }
     setIsLoading(false);
@@ -65,11 +77,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
    * @param {SlackUser} userData - The user data from Slack
    * @param {string} token - The access token for API calls
    */
-  const login = (userData: SlackUser, token: string) => {
+  const login = (params: {
+    userData: SlackUser;
+    accessToken: string;
+    idToken: string;
+  }) => {
+    const { userData, accessToken, idToken } = params;
+
     setUser(userData);
-    setAccessToken(token);
+    setAccessToken(accessToken);
+    setIdToken(idToken);
     localStorage.setItem("slack_user", JSON.stringify(userData));
-    localStorage.setItem("slack_access_token", token);
+    localStorage.setItem("slack_access_token", accessToken);
+    localStorage.setItem("slack_id_token", idToken);
   };
 
   /**
@@ -95,17 +115,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
    * @returns {Promise<any>} The API response data
    * @throws {Error} When no access token is available or API call fails
    */
-  const callSlackAPI = async (endpoint: string, options: RequestInit = {}) => {
-    if (!accessToken) {
+  async function callSlackAPI<T>(
+    endpoint: string,
+    options: RequestInit = {}
+  ): Promise<T> {
+    if (!accessToken || !idToken) {
       throw new Error("Access token not found");
     }
 
     try {
-      const response = await fetch(`/api/slack/${endpoint}`, {
+      const response = await fetch(`${API_URL}/${endpoint}`, {
         ...options,
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${accessToken}`,
+          "X-ID-Token": idToken,
           ...options.headers,
         },
       });
@@ -120,16 +144,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         throw new Error(`API Error: ${response.status}`);
       }
 
-      return response.json();
+      return response.json() as Promise<T>;
     } catch (error) {
       console.error("API call error:", error);
       throw error;
     }
-  };
+  }
 
   return (
     <AuthContext.Provider
-      value={{ user, accessToken, login, logout, callSlackAPI, isLoading }}
+      value={{
+        user,
+        accessToken,
+        idToken,
+        login,
+        logout,
+        callSlackAPI,
+        isLoading,
+      }}
     >
       {children}
     </AuthContext.Provider>

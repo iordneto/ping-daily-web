@@ -91,7 +91,11 @@ export function useSlackOAuth() {
             throw new Error("Invalid JWT nonce");
           }
 
-          login(userData, tokenData.access_token);
+          login({
+            userData,
+            accessToken: tokenData.access_token,
+            idToken: tokenData.id_token,
+          });
 
           // Clear OAuth data from localStorage
           localStorage.removeItem(OAUTH_STORAGE_KEYS.STATE);
