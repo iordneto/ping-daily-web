@@ -1,6 +1,4 @@
 "use client";
-
-import { useState } from "react";
 import Link from "next/link";
 import {
   Hash,
@@ -22,38 +20,51 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-
-import {
-  getChannelsWithConfig,
-  getConfigByChannelId,
-  getAvailableChannels,
-  mockUsers,
-  mockConfigs,
-  type DailyStandupConfig,
-} from "@/lib/mock-data";
+import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
+import { ErrorDisplay } from "@/components/ui/ErrorDisplay";
 
 import CreateConfigDialog from "@/components/daily-standup/CreateConfigDialog";
+import useDashboardData, {
+  type AvailableChannel,
+} from "@/module/dashboard/services/useDashboardData";
 
 export default function DashboardPage() {
-  const [channelsWithConfig, setChannelsWithConfig] = useState(
-    getChannelsWithConfig()
-  );
-  const availableChannels = getAvailableChannels();
+  const { data: dashboardData, loading, error, refetch } = useDashboardData();
 
-  const handleConfigCreate = (newConfig: Omit<DailyStandupConfig, "id">) => {
-    // Aqui você faria a chamada para a API para criar a configuração
-    const configWithId = {
-      ...newConfig,
-      id: `CONFIG${Date.now()}`, // ID temporário
-    };
-
-    console.log("Nova configuração criada:", configWithId);
-
-    // Atualizar a lista local (simular atualização da API)
-    // Em um cenário real, você refaria a busca dos dados ou usaria um state manager
-    const updatedChannels = getChannelsWithConfig();
-    setChannelsWithConfig(updatedChannels);
+  const handleConfigCreate = (newConfig: any) => {
+    // TODO: Implement API call to create configuration
+    // For now, refetch data to update the dashboard
+    refetch();
   };
+
+  if (loading) {
+    return (
+      <div className="container mx-auto p-6 flex justify-center items-center min-h-[400px]">
+        <LoadingSpinner message="Carregando dados do dashboard..." />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto p-6">
+        <ErrorDisplay error={error} className="max-w-lg mx-auto" />
+        <div className="text-center mt-4">
+          <Button onClick={refetch}>Tentar Novamente</Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!dashboardData) {
+    return (
+      <div className="container mx-auto p-6 flex justify-center items-center min-h-[400px]">
+        <p className="text-muted-foreground">Nenhum dado encontrado.</p>
+      </div>
+    );
+  }
+
+  const { stats, channelsWithConfig, availableChannels } = dashboardData;
 
   return (
     <div className="container mx-auto p-6">
@@ -87,9 +98,7 @@ export default function DashboardPage() {
             <Hash className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              {channelsWithConfig.length}
-            </div>
+            <div className="text-2xl font-bold">{stats.configuredChannels}</div>
             <p className="text-xs text-muted-foreground">
               +2 desde o mês passado
             </p>
@@ -104,7 +113,7 @@ export default function DashboardPage() {
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">84%</div>
+            <div className="text-2xl font-bold">{stats.responseRate}%</div>
             <p className="text-xs text-muted-foreground">
               +5% desde a semana passada
             </p>
@@ -119,7 +128,7 @@ export default function DashboardPage() {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{mockUsers.length}</div>
+            <div className="text-2xl font-bold">{stats.activeMembers}</div>
             <p className="text-xs text-muted-foreground">
               Participando dos dailies
             </p>
@@ -133,7 +142,16 @@ export default function DashboardPage() {
           <h2 className="text-2xl font-semibold">Canais Configurados</h2>
           {availableChannels.length > 0 ? (
             <CreateConfigDialog
-              availableChannels={availableChannels}
+              availableChannels={availableChannels.map(
+                (channel: AvailableChannel) => ({
+                  id: channel.id,
+                  name: channel.name,
+                  displayName: channel.name,
+                  memberCount: channel.num_members,
+                  isPrivate: channel.is_private,
+                  hasConfiguration: false,
+                })
+              )}
               onSave={handleConfigCreate}
             >
               <Button>
@@ -156,7 +174,7 @@ export default function DashboardPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {channelsWithConfig.map((channel) => {
-            const config = getConfigByChannelId(channel.id);
+            const config = channel.config;
 
             return (
               <Link key={channel.id} href={`/dashboard/channel/${channel.id}`}>
@@ -165,7 +183,7 @@ export default function DashboardPage() {
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-lg flex items-center gap-2">
                         <Hash className="w-5 h-5" />
-                        {channel.name}
+                        {channel.displayName || channel.name}
                       </CardTitle>
                       {channel.isPrivate && (
                         <Badge variant="secondary">Privado</Badge>
@@ -186,7 +204,20 @@ export default function DashboardPage() {
 
                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
                           <Calendar className="w-4 h-4" />
-                          {config.frequency.join(", ")}
+                          {config.frequency
+                            .map((day: string) => {
+                              const dayMap: Record<string, string> = {
+                                monday: "Seg",
+                                tuesday: "Ter",
+                                wednesday: "Qua",
+                                thursday: "Qui",
+                                friday: "Sex",
+                                saturday: "Sáb",
+                                sunday: "Dom",
+                              };
+                              return dayMap[day] || day;
+                            })
+                            .join(", ")}
                         </div>
 
                         <div className="flex items-center justify-between">
@@ -197,20 +228,16 @@ export default function DashboardPage() {
                           </Badge>
 
                           <div className="flex -space-x-2">
-                            {mockUsers.slice(0, 3).map((user, index) => (
+                            {/* Display member avatars - using placeholders since we don't have user data from API yet */}
+                            {Array.from({
+                              length: Math.min(3, channel.memberCount),
+                            }).map((_, index) => (
                               <Avatar
-                                key={user.id}
+                                key={index}
                                 className="w-6 h-6 border-2 border-background"
                               >
-                                <AvatarImage
-                                  src={user.avatar}
-                                  alt={user.displayName}
-                                />
                                 <AvatarFallback className="text-xs">
-                                  {user.displayName
-                                    .split(" ")
-                                    .map((n) => n[0])
-                                    .join("")}
+                                  {String.fromCharCode(65 + index)}
                                 </AvatarFallback>
                               </Avatar>
                             ))}
