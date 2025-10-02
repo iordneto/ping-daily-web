@@ -6,6 +6,7 @@ import { SlackLoginForm } from "@/components/slack/SlackLoginForm";
 import { SlackDashboard } from "@/components/slack/SlackDashboard";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { redirect } from "next/navigation";
 
 /**
  * Home page component that renders either login form or user dashboard
@@ -14,6 +15,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
  */
 export default function Home() {
   const { user } = useAuth();
+
+  if (user) redirect("/dashboard");
 
   return (
     <main className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
@@ -34,29 +37,7 @@ export default function Home() {
             <h1 className="text-lg font-bold text-center mb-6 text-accent-foreground">
               SECURE SLACK INTEGRATION
             </h1>
-            {user ? <SlackDashboard /> : <SlackLoginForm />}
-          </CardContent>
-        </Card>
-
-        {/* Tactical Dashboard Access */}
-        <Card className="border-border">
-          <CardContent className="pt-6">
-            <div className="text-center">
-              <div className="flex items-center justify-center gap-2 mb-2">
-                <div className="w-1 h-1 bg-primary rounded-full"></div>
-                <h2 className="font-bold text-primary tracking-wider">
-                  COMMAND CENTER
-                </h2>
-              </div>
-              <p className="text-sm text-muted-foreground mb-4">
-                Acesse o sistema de controle de daily standups
-              </p>
-              <Link href="/dashboard">
-                <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold tracking-wider">
-                  ACESSAR DASHBOARD
-                </Button>
-              </Link>
-            </div>
+            <SlackLoginForm />
           </CardContent>
         </Card>
       </div>
