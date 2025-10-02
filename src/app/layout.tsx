@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { GeistSans, GeistMono } from "geist/font";
 import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
+import QueryProvider from "@/providers/QueryProvider";
 
 export const metadata: Metadata = {
   title: "Ping Daily - Tactical Operations Dashboard",
@@ -18,7 +19,9 @@ export default function RootLayout({
       <body
         className={`${GeistMono.className} bg-background text-foreground antialiased`}
       >
-        <AuthProvider>{children}</AuthProvider>
+        <QueryProvider>
+          <AuthProvider>{children}</AuthProvider>
+        </QueryProvider>
       </body>
     </html>
   );
