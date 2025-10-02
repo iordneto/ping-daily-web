@@ -7,6 +7,7 @@ import { SlackDashboard } from "@/components/slack/SlackDashboard";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { redirect } from "next/navigation";
+import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 
 /**
  * Home page component that renders either login form or user dashboard
@@ -14,7 +15,16 @@ import { redirect } from "next/navigation";
  * @returns {JSX.Element} The home page component
  */
 export default function Home() {
-  const { user } = useAuth();
+  const { user, isLoading } = useAuth();
+
+  // Wait for auth state to load before redirecting
+  if (isLoading) {
+    return (
+      <main className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
+        <LoadingSpinner message="Verificando autenticação..." />
+      </main>
+    );
+  }
 
   if (user) redirect("/dashboard");
 
