@@ -173,7 +173,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
  * @returns {AuthContextType} The authentication context value
  * @throws {Error} When used outside of AuthProvider
  */
-export function useAuth() {
+export function useAuth(): AuthContextType {
   const context = useContext(AuthContext);
   if (context === undefined) {
     throw new Error("useAuth must be used within AuthProvider");
