@@ -8,6 +8,7 @@ import {
   ReactNode,
 } from "react";
 import { SlackUser } from "@/types/slack";
+import { OAUTH_STORAGE_KEYS, SLACK_STORAGE_KEYS } from "@/config/slack";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -53,7 +54,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
    * Effect to restore user session from localStorage on component mount
    */
   useEffect(() => {
-    const savedUser = localStorage.getItem("slack_user");
+    const savedUser = localStorage.getItem(SLACK_STORAGE_KEYS.USER);
     const savedToken = localStorage.getItem("slack_access_token");
     const savedIdToken = localStorage.getItem("slack_id_token");
 
@@ -64,7 +65,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setIdToken(savedIdToken);
       } catch (error) {
         console.error("Error restoring user data:", error);
-        localStorage.removeItem("slack_user");
+        localStorage.removeItem(SLACK_STORAGE_KEYS.USER);
         localStorage.removeItem("slack_access_token");
         localStorage.removeItem("slack_id_token");
       }
@@ -87,7 +88,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(userData);
     setAccessToken(accessToken);
     setIdToken(idToken);
-    localStorage.setItem("slack_user", JSON.stringify(userData));
+    localStorage.setItem(SLACK_STORAGE_KEYS.USER, JSON.stringify(userData));
     localStorage.setItem("slack_access_token", accessToken);
     localStorage.setItem("slack_id_token", idToken);
   };
@@ -100,11 +101,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = async () => {
     setUser(null);
     setAccessToken(null);
-    localStorage.removeItem("slack_user");
-    localStorage.removeItem("slack_access_token");
+    localStorage.removeItem(SLACK_STORAGE_KEYS.USER);
+    localStorage.removeItem(SLACK_STORAGE_KEYS.ACCESS_TOKEN);
+    localStorage.removeItem(SLACK_STORAGE_KEYS.ID_TOKEN);
     // Clear other related OAuth data
-    localStorage.removeItem("slack_oauth_state");
-    localStorage.removeItem("slack_oauth_nonce");
+    localStorage.removeItem(OAUTH_STORAGE_KEYS.STATE);
+    localStorage.removeItem(OAUTH_STORAGE_KEYS.NONCE);
   };
 
   /**
@@ -121,6 +123,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   ): Promise<T> {
     if (!accessToken || !idToken) {
       throw new Error("Access token not found");
+    }
+
+    if (!API_URL) {
+      throw new Error("API URL not found");
     }
 
     try {

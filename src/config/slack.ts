@@ -24,3 +24,13 @@ export const OAUTH_STORAGE_KEYS = {
   STATE: "slack_oauth_state",
   NONCE: "slack_oauth_nonce",
 } as const;
+
+/**
+ * LocalStorage keys used for Slack user data
+ * @constant {Object}
+ */
+export const SLACK_STORAGE_KEYS = {
+  USER: "slack_user",
+  ACCESS_TOKEN: "slack_access_token",
+  ID_TOKEN: "slack_id_token",
+} as const;
