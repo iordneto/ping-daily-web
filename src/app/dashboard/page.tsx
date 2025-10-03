@@ -63,7 +63,7 @@ export default function DashboardPage() {
     );
   }
 
-  const { stats, channelsWithConfig, availableChannels } = dashboardData;
+  const { channelsWithConfig } = dashboardData;
 
   return (
     <div className="container mx-auto p-6">
@@ -91,15 +91,15 @@ export default function DashboardPage() {
       <div className="mb-6">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-2xl font-semibold">Canais Configurados</h2>
-          {availableChannels.length > 0 ? (
+          {channelsWithConfig.length > 0 ? (
             <CreateConfigDialog
-              availableChannels={availableChannels.map(
-                (channel: AvailableChannel) => ({
+              availableChannels={channelsWithConfig.map(
+                (channel: ChannelWithConfig) => ({
                   id: channel.id,
                   name: channel.name,
                   displayName: channel.name,
-                  memberCount: channel.num_members,
-                  isPrivate: channel.is_private,
+                  memberCount: channel.memberCount,
+                  isPrivate: channel.isPrivate,
                   hasConfiguration: false,
                 })
               )}

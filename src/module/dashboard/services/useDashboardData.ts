@@ -4,13 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ChannelWithConfig } from "../types";
 
 export type DashboardData = {
-  stats: {
-    configuredChannels: number;
-    responseRate: number;
-    activeMembers: number;
-  };
   channelsWithConfig: ChannelWithConfig[];
-  availableChannels: AvailableChannel[];
 };
 
 const useDashboardData = () => {
