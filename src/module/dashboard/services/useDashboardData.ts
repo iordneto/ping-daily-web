@@ -3,9 +3,7 @@ import { AvailableChannel } from "@/types/slack";
 import { useQuery } from "@tanstack/react-query";
 import { ChannelWithConfig } from "../types";
 
-export type DashboardData = {
-  channelsWithConfig: ChannelWithConfig[];
-};
+export type DashboardData = ChannelWithConfig[];
 
 const useDashboardData = () => {
   const { callSlackAPI } = useAuth();

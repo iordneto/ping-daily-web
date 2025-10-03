@@ -1,14 +1,6 @@
 "use client";
 import Link from "next/link";
-import {
-  Hash,
-  Users,
-  Settings,
-  Plus,
-  Calendar,
-  Clock,
-  TrendingUp,
-} from "lucide-react";
+import { Hash, Plus, Calendar, Clock } from "lucide-react";
 
 import {
   Card,
@@ -24,11 +16,15 @@ import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { ErrorDisplay } from "@/components/ui/ErrorDisplay";
 
 import CreateConfigDialog from "@/components/daily-standup/CreateConfigDialog";
-import { AvailableChannel } from "@/types/slack";
 import { ChannelWithConfig, useDashboardData } from "@/module/dashboard";
 
 export default function DashboardPage() {
-  const { data: dashboardData, isLoading, error, refetch } = useDashboardData();
+  const {
+    data: channelsWithConfig,
+    isLoading,
+    error,
+    refetch,
+  } = useDashboardData();
 
   const handleConfigCreate = (newConfig: any) => {
     // TODO: Implement API call to create configuration
@@ -55,15 +51,13 @@ export default function DashboardPage() {
     );
   }
 
-  if (!dashboardData) {
+  if (!channelsWithConfig) {
     return (
       <div className="container mx-auto p-6 flex justify-center items-center min-h-[400px]">
         <p className="text-muted-foreground">Nenhum dado encontrado.</p>
       </div>
     );
   }
-
-  const { channelsWithConfig } = dashboardData;
 
   return (
     <div className="container mx-auto p-6">
@@ -72,7 +66,7 @@ export default function DashboardPage() {
         <div className="flex items-center gap-4 mb-4">
           <div className="w-3 h-3 bg-primary rounded-full animate-pulse"></div>
           <h1 className="text-4xl font-bold text-primary tracking-wider">
-            TACTICAL DAILY OPS
+            PING DAILY
           </h1>
         </div>
         <p className="text-muted-foreground text-lg font-medium">
