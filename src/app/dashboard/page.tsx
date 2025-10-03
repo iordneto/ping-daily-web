@@ -16,7 +16,8 @@ import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { ErrorDisplay } from "@/components/ui/ErrorDisplay";
 
 import CreateConfigDialog from "@/components/daily-standup/CreateConfigDialog";
-import { ChannelWithConfig, useDashboardData } from "@/module/dashboard";
+import { useDashboardData } from "@/module/dashboard";
+import { ChannelWithConfig } from "@/module/channel/types";
 import { AvailableChannel } from "@/types/slack";
 import useAvailableChannels from "@/module/dashboard/services/useAvailableChannels";
 
