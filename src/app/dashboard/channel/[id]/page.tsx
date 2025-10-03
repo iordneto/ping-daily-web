@@ -8,11 +8,8 @@ import {
   Hash,
   Clock,
   Calendar,
-  Users,
   Settings,
   Eye,
-  MessageSquare,
-  TrendingUp,
   AlertCircle,
 } from "lucide-react";
 
@@ -40,33 +37,33 @@ import {
 import {
   mockChannels,
   mockUsers,
-  getConfigByChannelId,
   getHistoryByChannelId,
-  getUsersByIds,
   type DailyStandupHistory,
   type DailyStandupConfig,
 } from "@/lib/mock-data";
 
 import EditConfigDialog from "@/components/daily-standup/EditConfigDialog";
+import useGetChannelInfo from "@/module/channel/services/useGetChannelInfo";
 
 export default function ChannelPage() {
   const params = useParams();
   const channelId = params.id as string;
 
-  const channel = mockChannels.find((c) => c.id === channelId);
-  const initialConfig = getConfigByChannelId(channelId);
-  const history = getHistoryByChannelId(channelId);
+  const { data: channelInfo } = useGetChannelInfo(channelId);
+  const config = channelInfo?.config;
 
-  const [config, setConfig] = useState<DailyStandupConfig | undefined>(
-    initialConfig
-  );
+  console.log(channelInfo);
+
+  const channel = mockChannels[0];
+  const history = getHistoryByChannelId(channel.id);
+
   const [selectedHistory, setSelectedHistory] =
     useState<DailyStandupHistory | null>(null);
 
   const handleConfigSave = (updatedConfig: DailyStandupConfig) => {
-    setConfig(updatedConfig);
+    /* setConfig(updatedConfig); */
     // Aqui você faria a chamada para a API para salvar a configuração
-    console.log("Configuração atualizada:", updatedConfig);
+    /* console.log("Configuração atualizada:", updatedConfig); */
   };
 
   if (!channel) {

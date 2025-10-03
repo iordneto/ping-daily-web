@@ -269,13 +269,6 @@ export function getAvailableChannels(): SlackChannel[] {
   return mockChannels.filter((channel) => !channel.hasConfiguration);
 }
 
-// Função para buscar configuração por ID do canal
-export function getConfigByChannelId(
-  channelId: string
-): DailyStandupConfig | undefined {
-  return mockConfigs.find((config) => config.channelId === channelId);
-}
-
 // Função para buscar histórico por ID do canal
 export function getHistoryByChannelId(
   channelId: string
@@ -283,9 +276,4 @@ export function getHistoryByChannelId(
   return mockHistory
     .filter((history) => history.channelId === channelId)
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-}
-
-// Função para buscar usuários por IDs
-export function getUsersByIds(userIds: string[]): SlackUser[] {
-  return mockUsers.filter((user) => userIds.includes(user.id));
 }
