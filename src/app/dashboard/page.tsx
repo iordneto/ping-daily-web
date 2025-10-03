@@ -24,12 +24,11 @@ import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { ErrorDisplay } from "@/components/ui/ErrorDisplay";
 
 import CreateConfigDialog from "@/components/daily-standup/CreateConfigDialog";
-import useDashboardData, {
-  type AvailableChannel,
-} from "@/module/dashboard/services/useDashboardData";
+import { AvailableChannel } from "@/types/slack";
+import { ChannelWithConfig, useDashboardData } from "@/module/dashboard";
 
 export default function DashboardPage() {
-  const { data: dashboardData, loading, error, refetch } = useDashboardData();
+  const { data: dashboardData, isLoading, error, refetch } = useDashboardData();
 
   const handleConfigCreate = (newConfig: any) => {
     // TODO: Implement API call to create configuration
@@ -37,7 +36,7 @@ export default function DashboardPage() {
     refetch();
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="container mx-auto p-6 flex justify-center items-center min-h-[400px]">
         <LoadingSpinner message="Carregando dados do dashboard..." />
@@ -48,9 +47,9 @@ export default function DashboardPage() {
   if (error) {
     return (
       <div className="container mx-auto p-6">
-        <ErrorDisplay error={error} className="max-w-lg mx-auto" />
+        <ErrorDisplay error={error?.message} className="max-w-lg mx-auto" />
         <div className="text-center mt-4">
-          <Button onClick={refetch}>Tentar Novamente</Button>
+          <Button onClick={() => refetch()}>Tentar Novamente</Button>
         </div>
       </div>
     );
@@ -86,54 +85,6 @@ export default function DashboardPage() {
           <span>•</span>
           <span>ÚLTIMA ATUALIZAÇÃO: {new Date().toLocaleTimeString()}</span>
         </div>
-      </div>
-
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Canais Configurados
-            </CardTitle>
-            <Hash className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.configuredChannels}</div>
-            <p className="text-xs text-muted-foreground">
-              +2 desde o mês passado
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Taxa de Resposta
-            </CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.responseRate}%</div>
-            <p className="text-xs text-muted-foreground">
-              +5% desde a semana passada
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Membros Ativos
-            </CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.activeMembers}</div>
-            <p className="text-xs text-muted-foreground">
-              Participando dos dailies
-            </p>
-          </CardContent>
-        </Card>
       </div>
 
       {/* Channels List */}
@@ -173,7 +124,7 @@ export default function DashboardPage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {channelsWithConfig.map((channel) => {
+          {channelsWithConfig.map((channel: ChannelWithConfig) => {
             const config = channel.config;
 
             return (
