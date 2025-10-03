@@ -17,6 +17,8 @@ import { ErrorDisplay } from "@/components/ui/ErrorDisplay";
 
 import CreateConfigDialog from "@/components/daily-standup/CreateConfigDialog";
 import { ChannelWithConfig, useDashboardData } from "@/module/dashboard";
+import { AvailableChannel } from "@/types/slack";
+import useAvailableChannels from "@/module/dashboard/services/useAvailableChannels";
 
 export default function DashboardPage() {
   const {
@@ -25,6 +27,8 @@ export default function DashboardPage() {
     error,
     refetch,
   } = useDashboardData();
+
+  const { data: availableChannels } = useAvailableChannels();
 
   const handleConfigCreate = (newConfig: any) => {
     // TODO: Implement API call to create configuration
@@ -85,15 +89,15 @@ export default function DashboardPage() {
       <div className="mb-6">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-2xl font-semibold">Canais Configurados</h2>
-          {channelsWithConfig.length > 0 ? (
+          {availableChannels && availableChannels.length > 0 ? (
             <CreateConfigDialog
-              availableChannels={channelsWithConfig.map(
-                (channel: ChannelWithConfig) => ({
+              availableChannels={availableChannels.map(
+                (channel: AvailableChannel) => ({
                   id: channel.id,
                   name: channel.name,
                   displayName: channel.name,
-                  memberCount: channel.memberCount,
-                  isPrivate: channel.isPrivate,
+                  memberCount: channel.num_members,
+                  isPrivate: channel.is_private,
                   hasConfiguration: false,
                 })
               )}
