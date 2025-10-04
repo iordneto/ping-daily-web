@@ -141,10 +141,155 @@ export default function ChannelPage() {
 
       <Tabs defaultValue="config" className="space-y-6">
         <TabsList>
+          <TabsTrigger value="history">Histórico</TabsTrigger>
           <TabsTrigger value="config">Configuração</TabsTrigger>
           <TabsTrigger value="members">Membros</TabsTrigger>
-          <TabsTrigger value="history">Histórico</TabsTrigger>
         </TabsList>
+
+        {/* Histórico Tab */}
+        <TabsContent value="history" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Histórico de Daily Standups</CardTitle>
+              <CardDescription>
+                Clique em uma linha para ver detalhes das respostas
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Data</TableHead>
+                    <TableHead>Horário</TableHead>
+                    <TableHead>Taxa de Resposta</TableHead>
+                    <TableHead>Respostas</TableHead>
+                    <TableHead className="text-right">Ações</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {history.map((item) => (
+                    <TableRow
+                      key={item.id}
+                      className="cursor-pointer hover:bg-muted/50"
+                      onClick={() => setSelectedHistory(item)}
+                    >
+                      <TableCell className="font-medium">
+                        {formatDate(item.date)}
+                      </TableCell>
+                      <TableCell>{formatTime(item.sentAt)}</TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <div className="w-12 bg-muted rounded-full h-2">
+                            <div
+                              className="bg-primary h-2 rounded-full transition-all"
+                              style={{ width: `${item.responseRate}%` }}
+                            />
+                          </div>
+                          <span className="text-sm font-medium">
+                            {item.responseRate}%
+                          </span>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        {item.responses.length}/{item.totalMembers}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button variant="ghost" size="sm">
+                          <Eye className="w-4 h-4" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+
+          {/* Modal de Detalhes do Histórico */}
+          {selectedHistory && (
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle>
+                    Daily Standup - {formatDate(selectedHistory.date)}
+                  </CardTitle>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setSelectedHistory(null)}
+                  >
+                    Fechar
+                  </Button>
+                </div>
+                <CardDescription>
+                  Enviado às {formatTime(selectedHistory.sentAt)} •
+                  {selectedHistory.responses.length}/
+                  {selectedHistory.totalMembers} respostas
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Respostas dos usuários */}
+                <div>
+                  <h4 className="font-semibold mb-4">Respostas dos Membros</h4>
+                  <div className="space-y-4">
+                    {selectedHistory.responses.map((response) => {
+                      const user = mockUsers.find(
+                        (u) => u.id === response.userId
+                      );
+                      return (
+                        <div
+                          key={response.userId}
+                          className="border rounded-lg p-4"
+                        >
+                          <div className="flex items-center gap-3 mb-3">
+                            <Avatar className="w-8 h-8">
+                              <AvatarImage
+                                src={user?.avatar}
+                                alt={user?.displayName}
+                              />
+                              <AvatarFallback className="text-xs">
+                                {user?.displayName
+                                  .split(" ")
+                                  .map((n) => n[0])
+                                  .join("")}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div className="flex-1">
+                              <p className="font-medium">{user?.displayName}</p>
+                              <p className="text-sm text-muted-foreground">
+                                {formatTime(response.timestamp)} •
+                                <span
+                                  className={getStatusColor(response.status)}
+                                >
+                                  {getStatusText(response.status)}
+                                </span>
+                              </p>
+                            </div>
+                          </div>
+                          <div className="bg-muted p-3 rounded text-sm whitespace-pre-wrap">
+                            {response.message}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Resumo Compilado */}
+                {selectedHistory.compiledMessage && (
+                  <div>
+                    <h4 className="font-semibold mb-4">Resumo Gerado</h4>
+                    <div className="bg-muted p-4 rounded-lg">
+                      <div className="whitespace-pre-wrap text-sm">
+                        {selectedHistory.compiledMessage}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
+        </TabsContent>
 
         {/* Configuração Tab */}
         <TabsContent value="config" className="space-y-6">
@@ -293,151 +438,6 @@ export default function ChannelPage() {
               </div>
             </CardContent>
           </Card>
-        </TabsContent>
-
-        {/* Histórico Tab */}
-        <TabsContent value="history" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Histórico de Daily Standups</CardTitle>
-              <CardDescription>
-                Clique em uma linha para ver detalhes das respostas
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Data</TableHead>
-                    <TableHead>Horário</TableHead>
-                    <TableHead>Taxa de Resposta</TableHead>
-                    <TableHead>Respostas</TableHead>
-                    <TableHead className="text-right">Ações</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {history.map((item) => (
-                    <TableRow
-                      key={item.id}
-                      className="cursor-pointer hover:bg-muted/50"
-                      onClick={() => setSelectedHistory(item)}
-                    >
-                      <TableCell className="font-medium">
-                        {formatDate(item.date)}
-                      </TableCell>
-                      <TableCell>{formatTime(item.sentAt)}</TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <div className="w-12 bg-muted rounded-full h-2">
-                            <div
-                              className="bg-primary h-2 rounded-full transition-all"
-                              style={{ width: `${item.responseRate}%` }}
-                            />
-                          </div>
-                          <span className="text-sm font-medium">
-                            {item.responseRate}%
-                          </span>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        {item.responses.length}/{item.totalMembers}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <Button variant="ghost" size="sm">
-                          <Eye className="w-4 h-4" />
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-
-          {/* Modal de Detalhes do Histórico */}
-          {selectedHistory && (
-            <Card>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle>
-                    Daily Standup - {formatDate(selectedHistory.date)}
-                  </CardTitle>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setSelectedHistory(null)}
-                  >
-                    Fechar
-                  </Button>
-                </div>
-                <CardDescription>
-                  Enviado às {formatTime(selectedHistory.sentAt)} •
-                  {selectedHistory.responses.length}/
-                  {selectedHistory.totalMembers} respostas
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {/* Respostas dos usuários */}
-                <div>
-                  <h4 className="font-semibold mb-4">Respostas dos Membros</h4>
-                  <div className="space-y-4">
-                    {selectedHistory.responses.map((response) => {
-                      const user = mockUsers.find(
-                        (u) => u.id === response.userId
-                      );
-                      return (
-                        <div
-                          key={response.userId}
-                          className="border rounded-lg p-4"
-                        >
-                          <div className="flex items-center gap-3 mb-3">
-                            <Avatar className="w-8 h-8">
-                              <AvatarImage
-                                src={user?.avatar}
-                                alt={user?.displayName}
-                              />
-                              <AvatarFallback className="text-xs">
-                                {user?.displayName
-                                  .split(" ")
-                                  .map((n) => n[0])
-                                  .join("")}
-                              </AvatarFallback>
-                            </Avatar>
-                            <div className="flex-1">
-                              <p className="font-medium">{user?.displayName}</p>
-                              <p className="text-sm text-muted-foreground">
-                                {formatTime(response.timestamp)} •
-                                <span
-                                  className={getStatusColor(response.status)}
-                                >
-                                  {getStatusText(response.status)}
-                                </span>
-                              </p>
-                            </div>
-                          </div>
-                          <div className="bg-muted p-3 rounded text-sm whitespace-pre-wrap">
-                            {response.message}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* Resumo Compilado */}
-                {selectedHistory.compiledMessage && (
-                  <div>
-                    <h4 className="font-semibold mb-4">Resumo Gerado</h4>
-                    <div className="bg-muted p-4 rounded-lg">
-                      <div className="whitespace-pre-wrap text-sm">
-                        {selectedHistory.compiledMessage}
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          )}
         </TabsContent>
       </Tabs>
     </div>
