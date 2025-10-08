@@ -139,7 +139,7 @@ export default function ChannelPage() {
         </p>
       </div>
 
-      <Tabs defaultValue="config" className="space-y-6">
+      <Tabs defaultValue="history" className="space-y-6">
         <TabsList>
           <TabsTrigger value="history">Histórico</TabsTrigger>
           <TabsTrigger value="config">Configuração</TabsTrigger>
@@ -346,39 +346,6 @@ export default function ChannelPage() {
                     <div className="bg-muted p-3 rounded text-sm whitespace-pre-wrap">
                       {config.message}
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Estatísticas */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Estatísticas</CardTitle>
-                  <CardDescription>Dados dos últimos 30 dias</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <span>Taxa de resposta média</span>
-                    <span className="font-bold text-lg">82%</span>
-                  </div>
-
-                  <div className="flex justify-between items-center">
-                    <span>Total de dailies enviados</span>
-                    <span className="font-bold text-lg">{history.length}</span>
-                  </div>
-
-                  <div className="flex justify-between items-center">
-                    <span>Melhor taxa de resposta</span>
-                    <span className="font-bold text-lg text-green-600">
-                      100%
-                    </span>
-                  </div>
-
-                  <div className="flex justify-between items-center">
-                    <span>Última atualização</span>
-                    <span className="text-sm text-muted-foreground">
-                      {formatDate(config.updatedAt)}
-                    </span>
                   </div>
                 </CardContent>
               </Card>
