@@ -28,25 +28,6 @@ export interface DailyStandupConfig {
   updatedAt: string;
 }
 
-export interface DailyStandupResponse {
-  userId: string;
-  message: string;
-  timestamp: string;
-  status: "completed" | "partial" | "missed";
-}
-
-export interface DailyStandupHistory {
-  id: string;
-  channelId: string;
-  configId: string;
-  date: string;
-  sentAt: string;
-  responseRate: number; // 0-100
-  totalMembers: number;
-  responses: DailyStandupResponse[];
-  compiledMessage?: string;
-}
-
 // Dados mockados
 export const mockUsers: SlackUser[] = [
   {
@@ -168,97 +149,6 @@ export const mockConfigs: DailyStandupConfig[] = [
   },
 ];
 
-export const mockHistory: DailyStandupHistory[] = [
-  {
-    id: "HIST001",
-    channelId: "C01234567",
-    configId: "CONFIG001",
-    date: "2024-01-25",
-    sentAt: "2024-01-25T12:00:00Z",
-    responseRate: 87,
-    totalMembers: 8,
-    responses: [
-      {
-        userId: "U01234567",
-        message:
-          "Ontem: Finalizei a API de autenticação\nHoje: Vou trabalhar na integração com frontend\nBloqueios: Nenhum",
-        timestamp: "2024-01-25T12:15:00Z",
-        status: "completed",
-      },
-      {
-        userId: "U01234568",
-        message:
-          "Ontem: Code review e testes unitários\nHoje: Nova feature de notificações\nBloqueios: Aguardando design da UI",
-        timestamp: "2024-01-25T12:22:00Z",
-        status: "completed",
-      },
-      {
-        userId: "U01234569",
-        message:
-          "Ontem: Bugfix no módulo de pagamentos\nHoje: Continuando com o refactor do database",
-        timestamp: "2024-01-25T13:30:00Z",
-        status: "partial",
-      },
-    ],
-    compiledMessage:
-      "📋 **Daily Standup Summary - 25/01/2024**\n\n**Taxa de resposta:** 87% (7/8 membros)\n\n**Principais atividades:**\n• Finalização da API de autenticação ✅\n• Code reviews e testes unitários ✅\n• Bugfix no módulo de pagamentos ✅\n\n**Próximas prioridades:**\n• Integração frontend com API\n• Feature de notificações\n• Refactor do database\n\n**Bloqueios identificados:**\n• Aguardando design da UI para notificações\n\n---\n*Resumo gerado automaticamente pelo Ping Daily*",
-  },
-  {
-    id: "HIST002",
-    channelId: "C01234567",
-    configId: "CONFIG001",
-    date: "2024-01-24",
-    sentAt: "2024-01-24T12:00:00Z",
-    responseRate: 100,
-    totalMembers: 8,
-    responses: [
-      {
-        userId: "U01234567",
-        message:
-          "Ontem: Setup do ambiente de desenvolvimento\nHoje: Implementação da autenticação JWT\nBloqueios: Nenhum",
-        timestamp: "2024-01-24T12:05:00Z",
-        status: "completed",
-      },
-      {
-        userId: "U01234568",
-        message:
-          "Ontem: Análise de requisitos\nHoje: Criação dos testes unitários\nBloqueios: Nenhum",
-        timestamp: "2024-01-24T12:12:00Z",
-        status: "completed",
-      },
-    ],
-    compiledMessage:
-      "📋 **Daily Standup Summary - 24/01/2024**\n\n**Taxa de resposta:** 100% (8/8 membros)\n\n**Principais atividades:**\n• Setup do ambiente de desenvolvimento ✅\n• Análise de requisitos ✅\n\n**Próximas prioridades:**\n• Implementação da autenticação JWT\n• Criação dos testes unitários\n\n**Bloqueios identificados:**\n• Nenhum bloqueio reportado\n\n---\n*Resumo gerado automaticamente pelo Ping Daily*",
-  },
-  {
-    id: "HIST003",
-    channelId: "C01234568",
-    configId: "CONFIG002",
-    date: "2024-01-25",
-    sentAt: "2024-01-25T12:30:00Z",
-    responseRate: 60,
-    totalMembers: 5,
-    responses: [
-      {
-        userId: "U01234570",
-        message:
-          "Yesterday: Product roadmap review\nToday: User research interviews\nBlockers: None",
-        timestamp: "2024-01-25T12:45:00Z",
-        status: "completed",
-      },
-      {
-        userId: "U01234571",
-        message:
-          "Yesterday: Competitive analysis\nToday: Feature specifications",
-        timestamp: "2024-01-25T14:20:00Z",
-        status: "partial",
-      },
-    ],
-    compiledMessage:
-      "📋 **Daily Standup Summary - 25/01/2024**\n\n**Taxa de resposta:** 60% (3/5 membros)\n\n**Principais atividades:**\n• Product roadmap review ✅\n• Competitive analysis ✅\n\n**Próximas prioridades:**\n• User research interviews\n• Feature specifications\n\n**Bloqueios identificados:**\n• Nenhum bloqueio reportado\n\n---\n*Resumo gerado automaticamente pelo Ping Daily*",
-  },
-];
-
 // Função para buscar canais com configuração
 export function getChannelsWithConfig(): SlackChannel[] {
   return mockChannels.filter((channel) => channel.hasConfiguration);
@@ -267,13 +157,4 @@ export function getChannelsWithConfig(): SlackChannel[] {
 // Função para buscar canais disponíveis (sem configuração)
 export function getAvailableChannels(): SlackChannel[] {
   return mockChannels.filter((channel) => !channel.hasConfiguration);
-}
-
-// Função para buscar histórico por ID do canal
-export function getHistoryByChannelId(
-  channelId: string
-): DailyStandupHistory[] {
-  return mockHistory
-    .filter((history) => history.channelId === channelId)
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 }

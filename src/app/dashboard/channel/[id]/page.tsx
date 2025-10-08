@@ -37,13 +37,14 @@ import {
 import {
   mockChannels,
   mockUsers,
-  getHistoryByChannelId,
-  type DailyStandupHistory,
   type DailyStandupConfig,
 } from "@/lib/mock-data";
 
 import EditConfigDialog from "@/components/daily-standup/EditConfigDialog";
 import useGetChannelInfo from "@/module/channel/services/useGetChannelInfo";
+import useGetChannelHistory, {
+  DailyStandupHistory,
+} from "@/module/channel/services/useGetChannelHistory";
 
 export default function ChannelPage() {
   const params = useParams();
@@ -55,7 +56,8 @@ export default function ChannelPage() {
   console.log(channelInfo);
 
   const channel = mockChannels[0];
-  const history = getHistoryByChannelId(channel.id);
+  const { data: historyResponse } = useGetChannelHistory(channel.id);
+  const history = historyResponse?.history;
 
   const [selectedHistory, setSelectedHistory] =
     useState<DailyStandupHistory | null>(null);
@@ -167,7 +169,7 @@ export default function ChannelPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {history.map((item) => (
+                  {history?.map((item) => (
                     <TableRow
                       key={item.id}
                       className="cursor-pointer hover:bg-muted/50"
